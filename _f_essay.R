@@ -52,7 +52,7 @@ f_essay <- function(one, thetitle){
     }
     
     # TAGS --------------------------------------------------------------------
-    tags <- one %>% xml_find_all("standards") %>% xml_children() %>% xml_text() %>% str_remove_all("(referencenationalstandard)|(topic)|(statestandard)|(keywords)") %>% str_remove_all(":|-") %>%  str_trim() %>% str_to_lower() %>% str_replace_all(" ", "-")
+    tags <- one %>% xml_find_all("standards") %>% xml_children() %>% xml_text() %>% str_remove_all(":|-") %>%  str_trim() %>% str_to_lower() %>% str_replace_all(" ", "-")
     it <- str_replace(it, "THETAGS", flatten_tags(c(tags, "type-free-response", paste0("jmap-", str_remove(str_remove(folder, "\\.tst"),"Exam")))))
     
     # QUESTION ----------------------------------------------------------------
