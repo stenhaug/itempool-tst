@@ -3,11 +3,18 @@ f_multchoice <- function(one, thetitle){
     # EXPLANATION -------------------------------------------------------------
     x <- one %>% xml_find_all("rationale") %>% xml_find_all("rationalehtml") %>% xml_text()
     
-    if (length(x) > 0){
+    useexp <- FALSE
+    if(length(x) == 1){
+        if(str_count(x, "font-family") == 1){
+            useexp <- TRUE
+        }
+    }
+    
+    if (useexp){
         it <- t_multichoice_exp
         
         okay <- 
-            str_sub(x, str_locate(x, "font-style: normal")[1, 2] + 3, str_locate(x,  "/></span></div>")[1, 1] - 2) %>% 
+            str_sub(x, str_locate(x, "font-style: normal")[1, 2] + 3, str_locate(x,  "</span></div>")[1, 1] - 2) %>% 
             str_remove_all("\"") %>% 
             str_split("<|/>") %>% 
             .[[1]] %>% 
@@ -58,22 +65,23 @@ f_multchoice <- function(one, thetitle){
         str_split("\\[IMAGE\\]") %>% 
         map(make_text)
     
+    qtv <- QUESTION_TEXT[[1]]
     image_paths <- one %>% xml_find_all("questiontexthtml") %>% xml_text() %>% str_extract_all("images/\\w+\\.png") %>% .[[1]]
+    
     if (length(image_paths) > 0){
-        QUESTION_LATEX <- paste0(path, image_paths) %>% get_latex()
-        QUESTION_LATEX_FINAL <- QUESTION_LATEX %>% make_latex()
+        woven <- blend_text_and_latex_question(qtv, image_paths)
         it <- 
             it %>% 
             str_replace(
                 "THEQUESTION", 
-                interleave(QUESTION_TEXT[[1]], QUESTION_LATEX_FINAL) %>% paste0(collapse = ",")
+                woven
             )
     } else {
         it <- 
             it %>% 
             str_replace(
                 "THEQUESTION", 
-                QUESTION_TEXT[[1]]
+                qtv
             )
     }
     
@@ -81,33 +89,19 @@ f_multchoice <- function(one, thetitle){
     answers_nodes <- one %>% xml_find_all("answers") %>% xml_children()
     answertext <- answers_nodes %>% xml_find_all("answertext") %>% xml_text()
     answer_image_paths <- answers_nodes %>% xml_find_all("answerhtml") %>% xml_text() %>% str_extract_all("images/\\w+\\.png")
-    
     ANSWER_TEXT_LIST <- answertext %>% str_split("\\[IMAGE\\]") %>% map(make_text_answer)
     
-    ANSWER_LATEX_LIST <- list()
-    for (i in seq_along(answer_image_paths)){
-        if (length(answer_image_paths[[i]]) == 1){
-            ANSWER_LATEX_LIST[[i]] <- get_latex(paste0(path, answer_image_paths[[i]]))
+    OUT <- list()
+    for (i in 1:4){
+        if (length(answer_image_paths[[i]]) > 0){
+            OUT[[i]] <- blend_text_and_latex_answer(ANSWER_TEXT_LIST[[i]], answer_image_paths[[i]])
         } else {
-            ANSWER_LATEX_LIST[[i]] <- NA
-        }
-    }
-    ANSWER_LATEX_LIST_FINAL <- ANSWER_LATEX_LIST %>% map(make_latex_answer)
-    
-    FINAL_ANSWERS <- list()
-    for (i in (1:max(length(ANSWER_TEXT_LIST), length(ANSWER_LATEX_LIST_FINAL)))){
-        
-        if (is.na(ANSWER_LATEX_LIST_FINAL[[i]])){
-            FINAL_ANSWERS[[i]] <- ANSWER_TEXT_LIST[[i]]
-        } else {
-            FINAL_ANSWERS[[i]] <- 
-                interleave(ANSWER_TEXT_LIST[[i]], ANSWER_LATEX_LIST_FINAL[[i]]) %>% 
-                paste0(collapse = ",")
+            OUT[[i]] <- ANSWER_TEXT_LIST[[i]] %>% paste0(collapse = ",")
         }
     }
     
-    for (i in seq_along(FINAL_ANSWERS)){
-        it <- str_replace(it, paste0("ANSWER", i), FINAL_ANSWERS[[i]])
+    for (i in seq_along(OUT)){
+        it <- str_replace(it, paste0("ANSWER", i), OUT[[i]])
     }
     
     # CORRECT -----------------------------------------------------------------

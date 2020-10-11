@@ -1,14 +1,25 @@
+blend_text_and_latex_question <- function(qtv, image_paths){
+    QUESTION_LATEX <- paste0(path, image_paths) %>% get_latex()
+    QUESTION_LATEX_FINAL <- QUESTION_LATEX %>% map_chr(make_latex)
+    interleave(qtv, QUESTION_LATEX_FINAL) %>% paste0(collapse = ",")
+}
+
+blend_text_and_latex_answer <- function(a_text, a_image){
+    ANSWER_LATEX <- paste0(path, a_image) %>% get_latex()
+    ANSWER_LATEX_FINAL <- ANSWER_LATEX %>% map_chr(make_latex_answer)
+    interleave(a_text, ANSWER_LATEX_FINAL) %>% paste0(collapse = ",")
+}
+
 get_latex <- function(image_path){
-    x <- try(image_path %>% map_chr(~ mathpix(., insert = FALSE, retry = TRUE)))
+    x <- image_path %>% map_chr(~ try(mathpix(., insert = FALSE, retry = TRUE)))
     
-    if (x[1] == "Error : Still unable to process image after retrying. Exiting\n"){
-        return(image_path)
-    }
-    
-    x %>% 
+    x <- 
+        x %>% 
         str_remove_all("\\$\\$") %>% 
         str_remove_all("\\n") %>% 
         str_remove_all("\\\\hline")
+    
+    x %>% str_replace("Error : Still unable to process image after retrying. Exiting", "MISSING IMAGE")
 }
 
 make_latex <- function(equation){
@@ -104,3 +115,4 @@ desktop <- function(text, name = ""){
 }
 
 finish <- function(.list){.list %>% paste0(collapse = "ITEM FENCEPOST")}
+

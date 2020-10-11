@@ -1,4 +1,4 @@
-folder <- "0117ExamAI.tst"
+folder <- "AL1890-1899EXAMs.bnk"
 
 # setup -------------------------------------------------------------------
 library(tidyverse)
@@ -37,4 +37,4 @@ whatshere[worked] %>%
 
 which(!worked)
 
-# one <- questions_nodeset[[5]]
+# one <- questions_nodeset[[1]]

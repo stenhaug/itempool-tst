@@ -3,7 +3,14 @@ f_essay <- function(one, thetitle){
     # EXPLANATION -------------------------------------------------------------
     x <- one %>% xml_find_all("rationale") %>% xml_find_all("rationalehtml") %>% xml_text()
     
-    if (length(x) > 0){
+    useexp <- FALSE
+    if(length(x) == 1){
+        if(str_count(x, "font-family") == 1){
+            useexp <- TRUE
+        }
+    }
+    
+    if (useexp){
         it <- t_essay_exp
         
         okay <- 
@@ -45,8 +52,8 @@ f_essay <- function(one, thetitle){
     }
     
     # TAGS --------------------------------------------------------------------
-    tags <- one %>% xml_find_all("standards") %>% xml_children() %>% xml_text() %>% str_subset("^reference", negate = TRUE) %>% str_remove_all("(nationalstandard)|(topic)|(statestandard)|(keywords)") %>% str_remove_all(":|-") %>%  str_trim() %>% str_to_lower() %>% str_replace_all(" ", "-")
-    it <- str_replace(it, "THETAGS", flatten_tags(c(tags, "type-multiple-choice", paste0("jmap-", str_remove(str_remove(folder, "\\.tst"),"Exam")))))
+    tags <- one %>% xml_find_all("standards") %>% xml_children() %>% xml_text() %>% str_remove_all("(referencenationalstandard)|(topic)|(statestandard)|(keywords)") %>% str_remove_all(":|-") %>%  str_trim() %>% str_to_lower() %>% str_replace_all(" ", "-")
+    it <- str_replace(it, "THETAGS", flatten_tags(c(tags, "type-free-response", paste0("jmap-", str_remove(str_remove(folder, "\\.tst"),"Exam")))))
     
     # QUESTION ----------------------------------------------------------------
     QUESTION_TEXT <- 
@@ -58,15 +65,18 @@ f_essay <- function(one, thetitle){
         str_split("\\[IMAGE\\]") %>% 
         map(make_text)
     
+    qtv <- QUESTION_TEXT[[1]]
     image_paths <- one %>% xml_find_all("questiontexthtml") %>% xml_text() %>% str_extract_all("images/\\w+\\.png") %>% .[[1]]
+    
     if (length(image_paths) > 0){
-        QUESTION_LATEX <- paste0(path, image_paths) %>% get_latex()
-        QUESTION_LATEX_FINAL <- QUESTION_LATEX %>% map_chr(make_latex)
+        
+        woven <- blend_text_and_latex_question(qtv, image_paths)
+        
         it <- 
             str_replace(
                 it,
                 "THEQUESTION", 
-                interleave(QUESTION_TEXT[[1]], QUESTION_LATEX_FINAL) %>% paste0(collapse = ",")
+                woven
             )
     } else {
         it <- 
