@@ -1,4 +1,4 @@
-t_essay <- '{
+t_freeresponse <- '{
   "title": "THETITLE",
   "tags": [THETAGS],
   "itemDoc": [
@@ -34,7 +34,7 @@ t_essay <- '{
   ]
 }'
 
-t_essay_exp <- '{
+t_freeresponse_exp <- '{
   "title": "THETITLE",
   "tags": [THETAGS],
   "itemDoc": [

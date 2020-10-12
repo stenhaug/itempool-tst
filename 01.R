@@ -7,10 +7,14 @@ library(mathpix)
 
 source("_helpers.R")
 source("_f_.R")
+
 source("_f_multichoice.R")
-source("_f_essay.R")
+source("_f_expression.R")
+source("_f_freeresponse.R")
+
 source("_t_multichoice.R")
-source("_t_essay.R")
+source("_t_expression.R")
+source("_t_freeresponse.R")
 
 path <- str_glue("data/{folder}/")
 
@@ -37,4 +41,6 @@ whatshere[worked] %>%
 
 which(!worked)
 
-# one <- questions_nodeset[[1]]
+# one <- questions_nodeset[[3]]
+# hi <- f(one, "DIDTHISWORKBEHAPPY")
+# hi %>% finish() %>% desktop()

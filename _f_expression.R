@@ -1,50 +1,23 @@
-f_essay <- function(one, thetitle){
+f_expression <- function(one, thetitle, useexp, THEEXP){
     
     # EXPLANATION -------------------------------------------------------------
-    x <- one %>% xml_find_all("rationale") %>% xml_find_all("rationalehtml") %>% xml_text()
-    
-    useexp <- FALSE
-    if(length(x) == 1){
-        if(str_count(x, "font-family") == 1){
-            useexp <- TRUE
-        }
-    }
-    
     if (useexp){
-        it <- t_essay_exp
-        
-        okay <- 
-            str_sub(x, str_locate(x, "font-style: normal")[1, 2] + 3, str_locate(x,  "</span></div>")[1, 1] - 2) %>% 
-            str_remove_all("\"") %>% 
-            str_split("<|/>") %>% 
-            .[[1]] %>% 
-            map_chr(str_trim)
-        
-        new <- okay[okay != ""]
-        
-        handle <- function(x){
-            if (str_detect(x, "images/\\w+\\.png")){
-                return(paste0(path, str_extract(x, "images/\\w+\\.png")) %>% get_latex() %>% make_latex())
-            } else{
-                return(x %>% make_text())
-            }
-        }
-        
-        whatwehave <- new %>% map_chr(handle)
+        it <- t_expression#_exp
         
         it <-
+            # str_replace(
+            #     it,
+            #     "THEEXPLANATION",
+            #     whatwehave %>% paste0(collapse = ",")
+            # ) %>% 
             str_replace(
-                it,
-                "THEEXPLANATION",
-                whatwehave %>% paste0(collapse = ",")
-            ) %>% 
-            str_replace(
+                it, 
                 "THETITLE",
                 thetitle
             )
     } else {
         it <- 
-            t_essay %>% 
+            t_freeresponse %>% 
             str_replace(
                 "THETITLE",
                 thetitle
@@ -52,8 +25,8 @@ f_essay <- function(one, thetitle){
     }
     
     # TAGS --------------------------------------------------------------------
-    tags <- one %>% xml_find_all("standards") %>% xml_children() %>% xml_text() %>% str_remove_all(":|-") %>%  str_trim() %>% str_to_lower() %>% str_replace_all(" ", "-")
-    it <- str_replace(it, "THETAGS", flatten_tags(c(tags, "type-free-response", paste0("jmap-", str_remove(str_remove(folder, "\\.tst"),"Exam")))))
+    tags <- get_tags(one)
+    it <- str_replace(it, "THETAGS", flatten_tags(c(tags, "_expression", paste0("-exam-", addtotitle))))
     
     # QUESTION ----------------------------------------------------------------
     QUESTION_TEXT <- 
@@ -88,9 +61,9 @@ f_essay <- function(one, thetitle){
     }
     
     # OUT ---------------------------------------------------------------------
-    it
+    it %>% str_replace("THEEXPRESSION", THEEXP)
     
     # it %>% finish() %>% desktop()
 }
 
-f_essay_safely <- safely(f_essay)
+f_expression_safely <- safely(f_expression)

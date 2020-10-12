@@ -1,3 +1,31 @@
+get_tags <- function(one){
+    one %>% 
+        xml_find_all("standards") %>% 
+        xml_children() %>% 
+        xml_text() %>% 
+        str_remove_all(":|-") %>% 
+        str_trim() %>% 
+        str_to_lower() %>% 
+        str_replace_all(" ", "-") %>% 
+        str_replace_all("keywords", "keywords-") %>% 
+        str_replace_all("nationalstandard", "standard-cc-") %>% 
+        str_replace_all("statestandardny", "standard-ny") %>% 
+        str_replace_all("reference", "z-reference-") %>% 
+        str_replace_all("topic", "bucket-")
+}
+
+fix_folder <- function(folder){
+    str_remove(str_remove(folder, "\\.tst|\\.bnk"),"Exam|EXAMs|exam|Exams")
+}
+
+handle <- function(x){
+    if (str_detect(x, "images/\\w+\\.png")){
+        return(paste0(path, str_extract(x, "images/\\w+\\.png")) %>% get_latex() %>% make_latex())
+    } else{
+        return(x %>% make_text())
+    }
+}
+
 blend_text_and_latex_question <- function(qtv, image_paths){
     QUESTION_LATEX <- paste0(path, image_paths) %>% get_latex()
     QUESTION_LATEX_FINAL <- QUESTION_LATEX %>% map_chr(make_latex)

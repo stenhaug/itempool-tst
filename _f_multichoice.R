@@ -14,7 +14,7 @@ f_multchoice <- function(one, thetitle){
         it <- t_multichoice_exp
         
         okay <- 
-            str_sub(x, str_locate(x, "font-style: normal")[1, 2] + 3, str_locate(x,  "</span></div>")[1, 1] - 2) %>% 
+            str_sub(x, str_locate(x, "font-style: normal")[1, 2] + 3, str_locate(x,  "</span></div>")[1, 1] - 1) %>% 
             str_remove_all("\"") %>% 
             str_split("<|/>") %>% 
             .[[1]] %>% 
@@ -51,9 +51,11 @@ f_multchoice <- function(one, thetitle){
             )
     }
     
+    
+    
     # TAGS --------------------------------------------------------------------
-    tags <- one %>% xml_find_all("standards") %>% xml_children() %>% xml_text() %>% str_remove_all(":|-") %>%  str_trim() %>% str_to_lower() %>% str_replace_all(" ", "-")
-    it <- str_replace(it, "THETAGS", flatten_tags(c(tags, "type-multiple-choice", paste0("jmap-", str_remove(str_remove(folder, "\\.tst"),"Exam")))))
+    tags <- get_tags(one)
+    it <- str_replace(it, "THETAGS", flatten_tags(c(tags, "_multiplechoice", paste0("-exam-", addtotitle))))
     
     # QUESTION ----------------------------------------------------------------
     QUESTION_TEXT <- 

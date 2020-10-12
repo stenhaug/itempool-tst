@@ -1,4 +1,4 @@
-t_expression <- '{
+t_solve <- '{
   "title": "THETITLE",
   "tags": [THETAGS],
   "itemDoc": [
@@ -11,8 +11,20 @@ t_expression <- '{
     {
       "type": "paragraph",
       "children": [
-        {
+{
           "text": ""
+        },
+        {
+          "type": "math",
+          "latex": "THELEFT=",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        },
+        {
+          "text": " "
         },
         {
           "type": "expression",
@@ -23,7 +35,7 @@ t_expression <- '{
             "matchers": [
               {
                 "id": "matcher-1",
-                "latex": "THEEXPRESSION",
+                "latex": "THERIGHT",
                 "normalizedScore": 1,
                 "sameForm": true,
                 "simplified": false
@@ -47,7 +59,7 @@ t_expression <- '{
   ]
 }'
 
-t_expression_exp <- '{
+t_solve_exp <- '{
   "title": "THETITLE",
   "tags": [THETAGS],
   "itemDoc": [
@@ -60,8 +72,20 @@ t_expression_exp <- '{
     {
       "type": "paragraph",
       "children": [
-        {
+{
           "text": ""
+        },
+        {
+          "type": "math",
+          "latex": "THELEFT = ",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        },
+        {
+          "text": " "
         },
         {
           "type": "expression",
@@ -72,7 +96,7 @@ t_expression_exp <- '{
             "matchers": [
               {
                 "id": "matcher-1",
-                "latex": "THEEXPRESSION",
+                "latex": "THERIGHT",
                 "normalizedScore": 1,
                 "sameForm": true,
                 "simplified": false
