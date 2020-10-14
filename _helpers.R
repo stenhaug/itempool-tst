@@ -10,6 +10,8 @@ get_tags <- function(one){
         str_replace_all("keywords", "keywords-") %>% 
         str_replace_all("nationalstandard", "standard-cc-") %>% 
         str_replace_all("statestandardny", "standard-ny") %>% 
+        str_replace_all("statestandard", "standard-ny-") %>% 
+        str_remove("ny$") %>% 
         str_replace_all("reference", "z-reference-") %>% 
         str_replace_all("topic", "bucket-")
 }
@@ -143,4 +145,3 @@ desktop <- function(text, name = ""){
 }
 
 finish <- function(.list){.list %>% paste0(collapse = "ITEM FENCEPOST")}
-

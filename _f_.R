@@ -24,6 +24,17 @@ f <- function(one, thetitle){
                 str_split("<|/>") %>% 
                 .[[1]] %>% 
                 map_chr(str_trim)
+            
+            if(is.na(okay)){
+                okay <- 
+                    str_sub(x, str_locate(x, "font-style: italic")[1, 2] + 3, str_locate(x,  "</span></div>")[1, 1] - 1) %>% 
+                    str_remove_all("\"") %>% 
+                    str_split("<|/>") %>% 
+                    .[[1]] %>% 
+                    map_chr(str_trim)
+            }
+            
+            
             new <- okay[okay != ""]
             whatwehave <- new %>% map_chr(handle)
             
